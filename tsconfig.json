@@ -1,0 +1,26 @@
+{
+  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2019"],
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
+    "resolveJsonModule": true,
+    "target": "ES2019",
+    "strict": true,
+    "allowJs": true,
+    "checkJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowImportingTsExtensions": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./app/*"]
+    },
+    "types": [
+      "@shopify/app-bridge-types"
+    ],
+    "noEmit": true
+  }
+}

@@ -1,0 +1,7 @@
+node_modules
+.remix
+build
+public/build
+shopify-app-remix
+*/*.yml
+.shopify

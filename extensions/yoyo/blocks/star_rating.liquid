@@ -1,0 +1,181 @@
+{% assign avg_rating = block.settings.product.metafields.demo.avg_rating.value | round %}
+<style>
+   .main {
+     background-color: white;
+   }
+
+   .chat-widget-style {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background-color: #007bff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .chat-widget-style:hover {
+      background-color: #0e335b;
+
+    }
+
+
+    .chat-window-style {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      height: 400px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;  /* remove in case */
+    }
+
+
+
+    .chat-content-style {
+      height: 80%;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .input-container-style {
+      padding: 10px;
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    .message-input-style {
+      flex-grow: 1;
+      padding: 8px;
+      margin-right: 10px;
+    }
+
+    .send-button-style {
+      padding: 8px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+</style>
+
+
+<div class="main">
+
+  <div id="chat-widget" class="chat-widget-style"  onclick="toggleChat()">
+    <span>Chatu</span>
+  </div>
+
+
+  <div id="chat-window" class="chat-window-style">
+
+
+    <div id="chat-content" class="chat-content-style"></div>
+    <div id="input-container" class="input-container-style">
+      <input type="text" id="message-input" placeholder="Type your message" class="message-input-style">
+      <button id="send-button" class="send-button-style" onclick="sendMessage()">Send</button>
+      <button id="send-button" class="send-button-style" onclick="makeGetRequest()">GET</button>
+    </div>
+  </div>
+
+</div>
+
+
+
+
+<script>
+
+function makeGetRequest() {
+  // Perform your GET request here
+  fetch('https://biolab.lol/',{
+            mode: 'no-cors',
+            method: "get",
+            headers: {
+                 "Content-Type": "application/json",
+                 "Access-Control-Allow-Headers" : "Content-Type",
+              "Access-Control-Allow-Origin": "*",
+            },
+          })
+    .then(response => response.json())
+    .then(data => {
+      // Handle the response data as needed
+      console.log('GET request response:', data);
+    })
+    .catch(error => console.error('Error making GET request:', error));
+}
+   
+const socket = new WebSocket('ws://75.74.3.243:3000');
+
+// Handle incoming messages from the server
+socket.addEventListener('message', (event) => {
+  const chatContent = document.getElementById('chat-content');
+  const messageElement = document.createElement('div');
+  messageElement.textContent = event.data;
+  chatContent.appendChild(messageElement);
+});
+
+  function toggleChat() {
+      const chatWindow = document.getElementById('chat-window');
+      chatWindow.style.display = chatWindow.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function sendMessage() {
+      const inputElement = document.getElementById('message-input');
+      const message = inputElement.value;
+
+      if (message.trim() !== '') {
+        const chatContent = document.getElementById('chat-content');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = message;
+        chatContent.appendChild(messageElement);
+
+          // Send the message to the server
+          if (socket.readyState === WebSocket.OPEN) {
+          // Send the message to the server
+          socket.send(message);
+
+          // Clear the input field
+          inputElement.value = '';
+        } else {
+          console.error('WebSocket is not open');
+        }
+
+        // Clear the input field
+        inputElement.value = '';
+      }
+    }
+
+        // Add event listener to close the chat when clicking outside of it
+      document.addEventListener('click', function(event) {
+      const chatWindow = document.getElementById('chat-window');
+      const chatWidget = document.getElementById('chat-widget');
+
+      if (!chatWindow.contains(event.target) && !chatWidget.contains(event.target)) {
+        // Clicked outside of both chat window and chat widget
+        chatWindow.style.display = 'none';
+      }
+    });
+</script>
+
+
+{% schema %}
+{
+  "name": "chat widget",
+  "target": "section",
+  "settings": [
+    { "type": "product", "id": "product", "label": "product", "autofill": true },
+    { "type": "color", "id": "colour", "label": "Star Colour", "default": "#ff0000" }
+  ]
+}
+{% endschema %}
